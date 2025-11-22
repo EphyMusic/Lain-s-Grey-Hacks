@@ -51,7 +51,7 @@ end function
 
 /*
     Covers \<b>, \<i>, \<s>, and \<u>. 
-    Returns string with applied formatting tags. Formats include bold("b"), italics("i"), underline("u"), and strikethrough("s"). Only works for text displayed in terminal. In case of improper use, returns string unaltered.
+    Returns string with applied formatting tags. Formats include superscript("sup"), subscript("sub"), bold("b"), italics("i"), underline("u"), and strikethrough("s"). Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
     @param {string} style
     @return {string}
@@ -245,21 +245,6 @@ end function
 string.space = function(space)
     if not space isa number then return self
     return("<space=" + space + "em>" + self)
-end function
-
-/*
-    Covers \<sub> and \<sup>. 
-    Returns string in either super- ("sup") or sub- ("sub") script.
-    Only works for text displayed in terminal. In case of improper use, returns string unaltered.
-
-    @param {string} script
-    @return {string}
-    @example print("I'm gonna need about 10" + "24".script(sup) + " burgers, please.")
-*/
-string.script = function(script)
-    if not script isa string then return self
-    if not (script == "sup" or script == "sub") then return self
-    return("<" + script + ">" + self + "</" + script + ">")
 end function
 
 /*
