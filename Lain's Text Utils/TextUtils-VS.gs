@@ -50,7 +50,7 @@ string.case = function(case)
 end function
 
 /*
-    Covers \<b>, \<i>, \<s>, and \<u>. 
+    Covers \<sup>, \<sub>, \<b>, \<i>, \<s>, and \<u>. 
     Returns string with applied formatting tags. Formats include superscript("sup"), subscript("sub"), bold("b"), italics("i"), underline("u"), and strikethrough("s"). Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
     @param {string} style
