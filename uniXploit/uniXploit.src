@@ -1,0 +1,115 @@
+#include "helpers/meta.gs"
+#include "helpers/utils.gs"
+#include "helpers/ports.gs"
+
+port = null
+ip = null
+target = null
+targetList = ["shell","passwd"]
+if params.len >= 1 then
+    ip = params[0]
+    if params.len > 1 then target = params[1]
+end if
+
+if not (ip and is_valid_ip(ip)) then
+    while true
+        ip = user_input("Enter IP Address: ")
+        if is_valid_ip(ip) then break
+        print("Invalid IP.".color(255,0,0))
+    end while
+end if
+
+if target != "firewall" then
+    ports = openPorts(ip)
+    port = portSelect(ports)
+else
+    port = 0
+end if
+x = 0
+if not target then
+    TextLog.clearLog()
+    for trgt in targetList
+        TextLog.add("["+x+"] " + trgt)
+        x = x + 1
+    end for
+        while true
+            TextLog.printLog()
+            target = user_input("Choose a method: ").to_int
+            if (targetList.hasIndex(target)) then
+                target = targetList[target]
+                break
+            end if
+            TextLog.warnLog("WARNING: Choice out of index.")
+        end while
+end if
+
+metaLib = getLib(ip,port)
+exploits = extractExploits(metaLib)
+
+memList = listExploits_Mem(exploits)
+
+address = selectMem(memList)
+
+vulnList = listExploits_Tag(address,exploits)
+
+attack = selectTag(vulnList, address)
+fail = null
+while true
+    result = null
+    while true
+        if not fail then 
+            result = metaLib.overflow(attack.address, attack.tag)
+            TextLog.clearLog()
+        end if
+        fail = null
+        if not result then
+            TextLog.warnLog("The previous attack failed.")
+            choice = user_input("Type ""m"" to restart from Memory Select. Type ""v"" to restart from Vulnerability Select. Anything else to exit.",0,1)
+            if choice == "m" then
+                address = selectMem(memList)
+                vulnList = listExploits_Tag(address,exploits)
+                attack = selectTag(vulnList, address)
+            else if choice == "v" then
+                attack = selectTag(vulnList, address)
+            else
+                exit("exiting...")
+            end if
+            continue
+        end if
+        break
+    end while
+
+    if target == "passwd" then
+        decipheredPasswd = crackPasswd(result)
+        if not decipheredPasswd then 
+            TextLog.warnLog("WARNING: Could not crack passwd file. No read permission for current privilege level.")
+            Timer.waitSec(3)
+            fail = 1
+            continue
+        end if
+        saveOK = savePasswd(decipheredPasswd,ip)
+        if saveOK then
+            TextLog.clearLog()
+            TextLog.printLog("Success!!".color(0,255,0))
+            TextLog.printLog("Passwd report saved in " + (home + "/Reports/ as " + ip + "_passwd.txt").color(0,150,255))
+        else
+            TextLog.clearLog()
+            TextLog.warnLog("WARNINIG: failed to save file at " + home + "/Reports/ as " + ip + "_passwd.txt")
+        end if
+        Timer.waitSec(3)
+        exit("Program End")
+    else if target == "shell" then
+        //shell stuff
+        if not getShell(result) then
+            TextLog.warnLog("WARNING: Not a shell object.")
+            Timer.waitSec(3)
+            fail = 1
+            continue
+        else
+            result.start_terminal
+            break
+        end if
+    end if
+    break
+end while
+
