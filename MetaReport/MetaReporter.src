@@ -1,0 +1,38 @@
+#include "helpers/utils.gs"
+#include "helpers/ports.gs"
+#include "helpers/meta.gs"
+
+port = null
+
+if not params then
+    ip = user_input("Enter ip address: ")
+else if params.len == 1 then
+    ip = params[0]
+else if params.len >= 2 then
+    ip = params[0]
+    port = params[1]
+end if
+
+if not port then
+    ports = openPorts(ip)
+    TextLog.currentLimit = 15
+    TextLog.add("Open Ports on " + ip.color(255,255,0) + ":")
+    i = 0
+    for port in ports
+        TextLog.add("[" + str(i).color(0,255,255) + "] ("+ str(port).color(255,0,0) + ")")
+        i = i + 1
+    end for
+    TextLog.printLog
+    sel = ""
+    while true
+        sel = user_input("Select a port (index): ").to_int
+        if ports.hasIndex(sel) then break
+        TextLog.warnLog(sel + " is not a number or is not in index. Please try again.")
+    end while
+end if
+ resFile = constructReport(getLib(ip,port))
+if resFile isa string then
+    print(resFile)
+else
+    print("Report success. Find all reports in home/{user}/MetaReports (or root/MetaReports)".color(50,255,150))
+end if
