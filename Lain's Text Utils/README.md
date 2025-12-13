@@ -48,8 +48,9 @@ string.csize(percent)
 string.space(number)
 - Adds a space. If you need some space. In positive em values
 
-string.voffset(number)
+string.voffset(number,number)
 - offsets the displayed string vertically. In +-em
+- second argument applies voffset to each line in multiline string
 
 string.width(percent)
 - squeezes text to within a certain percentage of terminal.
