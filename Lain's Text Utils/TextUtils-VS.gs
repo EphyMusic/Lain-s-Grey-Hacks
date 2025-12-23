@@ -1,7 +1,7 @@
 ///Lain's TextMesh Pro utils
 
 /*
-    Covers \<align>. 
+    Covers `<align>`. 
     Returns string encased in alignment tags. Value must be a string: "center", "left", "right", "justified", or "flush".
     Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
@@ -28,7 +28,7 @@ string.align = function(alignment)
 end function
 
 /*
-    Covers \<font>, albeit barely. 
+    Covers `<font>`, albeit barely. 
     Returns string with alternative font. Currently only one font is currently validated (LiberationSans SDF),
     thus this only returns the string in that one font. If GH adds other fonts or other fonts are validated,
     this function will be reworked to allow selection of other fonts or allow inserting string of Font Name.
@@ -51,7 +51,7 @@ string.altFont = function()
 end function
 
 /*
-    Covers \<uppercase>, \<lowercase>, \<allcaps>, and \<smallcaps>. 
+    Covers `<uppercase>`, `<lowercase>`, `<allcaps>`, and `<smallcaps>`. 
     Returns string encased in case tags. Must be a string: "uppercase", "lowercase", "allcaps", or "smallcaps".
     Only works for text displayed in terminal. In case of improper use, returns string unaltered. 
     Note: "uppercase" and "allcaps" are functionally the same, as noted in the TextMeshPro documentation.
@@ -79,7 +79,7 @@ string.case = function(case)
 end function
 
 /*
-    Covers \<sup>, \<sub>, \<b>, \<i>, \<s>, and \<u>. 
+    Covers `<sup>`, `<sub>`, `<b>`, `<i>`, `<s>`, and `<u>`. 
     Returns string with applied formatting tags. Formats include superscript("sup"), subscript("sub"), bold("b"), italics("i"), underline("u"), and strikethrough("s"). 
     Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
@@ -107,12 +107,11 @@ string.format = function(format)
 end function
 
 /*
-    Covers \<cspace>. 
+    Covers `<cspace>`. 
     Returns string with applied character spacing (cspace) tags. Changes spacing between characters.
     Value is absolute to font units (em). Only works for text displayed in terminal.
 
     @param {number} cspace
-    @param {number} relative
     @example print("Safeway is owned by Albertsons.".cspace(2))
     @example
     @example store = "There are very few Albertsons stores left."
@@ -134,39 +133,60 @@ string.cspace = function(cspace)
 end function
 
 /*
-    Covers \<indent> and \<line-indent>. 
-    Returns string with applied indent or line indent tags. By default, performs regular indent. Value is a percentage (0-100).
+    Covers `<indent>` and `<line-indent>`. 
+    Returns string with applied indent or line indent tags. By default, performs regular indent.
+    First param is value, second param selects between em and % for value. px is static. % is dynamic.
     For line indent, set the optional line tag to anything other than 0 or null. Only works for text displayed in terminal.
     In case of improper use, returns string unaltered.
 
-    @param {number} percent
+    @param {number} num
+    @param {bool} percent
     @return {string}
     @example print("It's an indent".indent(15))
     @example print("I don't really know /n how to show you what it does via example.".indent(15,1))
 */
-string.indent = function(percent, line = 0)
-    if not percent isa number then return self
-    percent = clamp(percent,0,100)
+string.indent = function(num,percent = 0, line = 0)
+    if not num isa number then return self
+    if percent then num = clamp(num,0,100)
 
     if self.indexOf(char(10)) then
         sList = self.split(char(10))
         eList = []
         for text in sList
             if not line then
-                eList.push("<indent=" + percent + "%>" + text + "</indent>")
+                if percent then
+                    eList.push("<indent=" + num + "%>" + text + "</indent>")
+                else
+                    eList.push("<indent=" + num + "em>" + text + "</indent>")
+                end if
             else
-                eList.push("<line-indent=" + percent + "%>" + text + "</line-indent>")
+                if percent then
+                    eList.push("<line-indent=" + num + "%>" + text + "</line-indent>")
+                else
+                    eList.push("<line-indent=" + num + "em>" + text + "</line-indent>")
+                end if
             end if
         end for
         return eList.join(char(10))
     end if
 
-    if not line then return("<indent=" + percent + "%>" + self + "</indent>")
-    return("<line-indent=" + percent + "%>" + self + "</line-indent>")
+    if not line then
+        if percent then
+            return "<indent=" + num + "%>" + self + "</indent>"
+        else
+            return "<indent=" + num + "em>" + self + "</indent>"
+        end if
+    else
+        if percent then
+            return "<line-indent=" + num + "%>" + self + "</line-indent>"
+        else
+            return "<line-indent=" + num + "em>" + self + "</line-indent>"
+        end if
+    end if
 end function
 
 /*
-    Covers \<alpha>. 
+    Covers `<alpha>`. 
     Takes alpha value (0-255) and returns a string encased in alpha tags. Alpha value affects opacity (visibility) of text.
     Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
@@ -192,7 +212,7 @@ string.alpha = function(alpha)
 end function
 
 /*
-    Covers \<color>. 
+    Covers `<color>`. 
     Takes rgb(255,255,255) and optional alpha (255) and returns string with added color tags and correct hex.
     Optional mark flag returns marked (highlighted) string instead of colored string when set to anything but 0 or null.
     Only works for text displayed in terminal. In case of improper use, returns string unaltered.
@@ -232,40 +252,55 @@ string.color = function(r,g,b,a=255,mark = 0)
 end function
 
 /*
-    Covers \<margin>, \<margin-left>, and \<margin-right>.
-    Returns string with applied margin tags. Value is percentage (0-100). By default, calls the default <margin> tag. 
+    Covers `<margin>`, `<margin-left>`, and `<margin-right>`.
+    Returns string with applied margin tags. By default, calls the default <margin> tag. 
+    First param is value, second param selects between em and % for value. px is static. % is dynamic.
     The optional side flag can be used to choose the side the margin tag should affect ("left" or "right").
     Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
-    @param {number} percent
+    @param {number} num
+    @param {bool} percent
     @param {string} side
     @return {string}
     @example print("The jack in the box /n is the best spot for curly fries.".margin(15,"left"))
 */
-string.margin = function(percent,side = "")
-    if not (percent isa number and side isa string) then return self
+string.margin = function(num,percent = 0, side = "")
+    if not (num isa number and side isa string) then return self
     if not (side == "left" or side == "right" or side == "") then return self
-    percent = clamp(percent,0,100)
+    if percent then num = clamp(num,0,100)
 
     if self.indexOf(char(10)) then
         sList = self.split(char(10))
         eList = []
+
         for text in sList
-            if (side == "left" or side == "right") then
-                eList.push("<margin-"+ side + "=" + percent + "%>" + text + "</margin>")
+            if side then
+                if percent then
+                    eList.push("<margin-"+ side + "=" + num + "%>" + text + "</margin>")
+                else
+                    eList.push("<margin-"+ side + "=" + num + "em>" + text + "</margin>")
+                end if
             else
-                eList.push("<margin=" + percent + "%>" + text + "</margin>")
+                if percent then
+                    eList.push("<margin=" + num + "%>" + text + "</margin>")
+                else
+                    eList.push("<margin=" + num + "em>" + text + "</margin>")
+                end if
             end if
         end for
         return eList.join(char(10))
     end if
 
-    if (side == "left" or side == "right") then return("<margin-"+ side + "=" + percent + "%>" + self + "</margin>")
-    return("<margin=" + percent + "%>" + self + "</margin>")
+    if side then
+        if percent then return "<margin-"+ side + "=" + num + "%>" + self + "</margin>"
+        return "<margin-"+ side + "=" + num + "em>" + self + "</margin>"
+    else
+        if percent then return "<margin=" + num + "%>" + self + "</margin>"
+        return "<margin=" + num + "em>" + self + "</margin>"
+    end if
 end function
-
 /*
-    Covers \<mspace>.
+    Covers `<mspace>`.
     Returns string with applied monospacing tags. Spacing is absolute to font units (em).
     Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
@@ -290,7 +325,7 @@ string.mspace = function(spacing)
 end function
 
 /*
-    Covers \<nobr>.
+    Covers `<nobr>`.
     Returns string with applied no break tags. encased string will not be broken by word wrap, unless the string is too long to display without breaking.
     Only works for text displayed in terminal.
 
@@ -311,32 +346,38 @@ string.nobr = function()
 end function
 
 /*
-    Covers \<pos>.
-    Returns string at specified position in terminal (percentage value, 0-100). Only works for text displayed in terminal.
-    In case of improper use, returns string unaltered.
+    Covers `<pos>`.
+    Returns string at specified position in terminal. First param is value, second param selects between em and % for value. px is static. % is dynamic.
+    Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
-    @param {number} percent
+    @param {number} num
+    @param {bool} percent
     @return {string}
     @example print("Foodmaxx is" + "<-- all the way over there".pos(50))
 */
-string.pos = function(percent)
-    if not percent isa number then return self
-    percent = clamp(percent,0,100)
+string.pos = function(num,percent = false)
+    if not num isa number then return self
+    if percent then num = clamp(num,0,100)
 
     if self.indexOf(char(10)) then
         sList = self.split(char(10))
         eList = []
         for text in sList
-            eList.push("<pos=" + percent + "%>" + text)
+            if percent then
+                eList.push("<pos=" + num + "%>" + text)
+            else
+                eList.push("<pos=" + num + "em>" + text)
+            end if
         end for
         return eList.join(char(10))
     end if
 
-    return("<pos=" + percent + "%>" + self)
+    if percent then return "<pos=" + num + "%>" + self
+    return "<pos=" + num + "em>" + self
 end function
 
 /*
-    Covers \<rotate>. 
+    Covers `<rotate>`. 
     Returns string with applied rotation tags, rotating each character to the specified degree. Value is rotational degrees (-180 to 180).
     Values lower than -180 or higher than 180 will be clamped to the range.
     Only works for text displayed in terminal. In case of improper use, returns string unaltered.
@@ -362,32 +403,38 @@ string.rotate = function(degree)
 end function
 
 /*
-    Covers \<size>. 
-    Returns string at target size. Value is percentage, can be more than 100%. 
+    Covers `<size>`. 
+    Returns string at target size. First param is value, second param selects between px and % for value. em is static. % is dynamic. 
     Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
-    @param {number} percent
+    @param {number} num
+    @param {bool} percent
     @return {string}
     @example print("Ikea is " + "big".size(100))
 */
-string.csize = function(percent)
-    if not percent isa number then return self
-    percent = clamp(percent,0,100)
+string.csize = function(num,percent = 0)
+    if not num isa number then return self
+    if percent then num = clamp(num,0,100)
 
     if self.indexOf(char(10)) then
         sList = self.split(char(10))
         eList = []
         for text in sList
-            eList.push("<size=" + percent + "%>" + text + "</size>")
+            if percent then
+                eList.push("<size=" + num + "%>" + text + "</size>")
+            else
+                eList.push("<size=" + num + "em>" + text + "</size>")
+            end if
         end for
         return eList.join(char(10))
     end if
 
-    return("<size=" + percent + "%>" + self + "</size>")
+    if percent then return "<size=" +  num + "%>" + self + "</size>"
+    return "<size=" + num + "em>" + self + "</size>"
 end function
 
 /*
-    Covers \<space>. 
+    Covers `<space>`. 
     Returns string with added space. Value is in font units (em). Only works for text displayed in terminal.
     In case of improper use, returns string unaltered.
 
@@ -411,7 +458,7 @@ string.space = function(space)
 end function
 
 /*
-    Covers \<voffset>.
+    Covers `<voffset>`.
     Returns string with specified vertical offset. Value is in font units (em). Value can be positive (up) or negative (down).
     Only works for text displayed in terminal. In case of improper use, returns string unaltered. Second argument applies voffset
     to each new line separately.
@@ -421,46 +468,66 @@ end function
     @return {string}
     @example print("I'm getting tired of writing these " + "dang".voffset(2) + " descriptions.")
 */
-string.voffset = function(offset,multiline = 0)
+string.voffset = function(offset)
     if not offset isa number then return self
 
-    if multiline then
-        if self.indexOf(char(10)) then
-            sList = self.split(char(10))
-            eList = []
-            for text in sList
-                eList.push("<voffset=" + offset + "em>" + text + "</voffset>")
-            end for
-            return eList.join(char(10))
-        end if
+    if self.indexOf(char(10)) then
+        sList = self.split(char(10))
+        eList = []
+        for text in sList
+            eList.push("<voffset=" + offset + "em>" + text + "</voffset>")
+        end for
+        return eList.join(char(10))
     end if
     
     return ("<voffset=" + offset + "em>" + self + "</voffset>")
 end function
 
 /*
-    Covers \<width>. 
-    Returns string limited on right by width value. Word wrap will take place at set width value. Value is percentage (0-100).
-    100% is max width. Only works for text displayed in terminal. In case of improper use, returns string unaltered.
+    Covers `<width>`. 
+    Returns string limited on right by width value. Word wrap will take place at set width value. 
+    First param is value, second param selects between px and % for value. px is static. % is dynamic.
+    Only works for text displayed in terminal. In case of improper use, returns string unaltered.
 
-    @param {number} percent
+    @param {number} num
+    @param {bool} percent 
     @return {string}
-    @example print("I am 100% done with this. Sincerely, writing descriptions for functions sucks.".width(50))
+    @example print("I am 100% done with this. Sincerely, writing descriptions for functions sucks.".width(50,1))
 */
-string.width = function(percent)
-    if not percent isa number then return self
-    percent = clamp(percent,0,100)
+
+string.width = function(num, percent = 0)
+    if not num isa number then return self
+    if percent then num = clamp(num,0,100)
 
     if self.indexOf(char(10)) then
         sList = self.split(char(10))
         eList = []
         for text in sList
-            eList.push("<width=" + percent + "%>" + text + "</width>")
+            if percent then
+                eList.push("<width=" + num + "%>" + text + "</width>")
+            else
+                eList.push("<width=" + num + "px>" + text + "</width>")
+            end if
         end for
         return eList.join(char(10))
     end if
 
-    return("<width=" + percent + "%>" + self + "</width>")
+    if percent then return "<width=" + num + "%>" + self + "</width>"
+    return "<width=" + num + "px>" + self + "</width>"
+end function
+
+///Other TMP utils
+
+/*
+    Covers `<sprite>`.
+    Prints one of three whole sprites. Wow.
+    
+    @param {number} num
+    @return {string}
+*/
+sprite = function(num)
+    clamp(num,0,2)
+    return "<sprite=" + num + ">"
 end function
 
 
