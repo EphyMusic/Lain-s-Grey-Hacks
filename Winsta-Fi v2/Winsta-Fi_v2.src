@@ -1,0 +1,49 @@
+Crypto = include_lib("lib/crypto.so")
+computer = get_shell.host_computer
+path = "/home/" + active_user + "/"
+devices = computer.network_devices().split(char(10))
+dev = ""
+
+if devices[devices.len - 1] == "" then devices.remove(devices.len - 1)
+
+for device in devices
+    dev = device.split(" ")[0]
+    if Crypto.airmon("start",dev) then
+        print("Starting monitor on " + dev + ".")
+        break
+    end if
+end for
+
+networks = computer.wifi_networks(dev)
+netList = []
+
+for network in networks
+    obj = network.split(" ")
+    objBid = obj[0]
+    objPwr = obj[1][:-1].to_int
+    objEid = obj[2]
+    objAck = 300000/(objPwr + 15)
+    netList.push({"bssid": objBid, "essid": objEid, "power": objPwr, "acks": objAck})
+end for
+
+target = {}
+print("starting...")
+
+netList.sort("power")
+target = netList[-1]
+res = true
+
+while res != null
+    res = Crypto.aireplay(target.bssid,target.essid,target.acks)
+end while
+file = computer.File(path + "file.cap")
+if file then target.pass = Crypto.aircrack(path + "file.cap")
+if target.pass then 
+    if computer.connect_wifi(dev,target.bssid,target.essid,target.pass) == 1 then
+        print("Success. Turning off monitor.",1)
+        Crypto.airmon("stop", dev)
+        print("Monitor on " + dev + " off.")
+    end if
+end if
+
+get_shell.launch("/usr/bin/Browser.exe")
