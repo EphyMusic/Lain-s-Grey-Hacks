@@ -241,14 +241,14 @@ string.color = function(r,g,b,a=255,mark = 0)
             if mark then
                 eList.push("<mark=" + colorHex + ">" + text + "</mark>")
             else
-                eList.push("<color=" + colorHex + ">" + text + "</color>")
+                eList.push("<" + colorHex + ">" + text + "</color>")
             end if
         end for
         return eList.join(char(10))
     end if
 
     if mark then return("<mark=" + colorHex + ">" + self + "</mark>")
-    return("<color=" + colorHex + ">" + self + "</color>")
+    return("<" + colorHex + ">" + self + "</color>")
 end function
 
 /*
@@ -564,7 +564,8 @@ _toHexByte = function(n)
 end function
 
 rgb_to_hex = function(r,g,b,a)
-    return ("#" + _toHexByte(r) + _toHexByte(g) + _toHexByte(b) + _toHexByte(a))
+    if a < 255 then return ("#" + _toHexByte(r) + _toHexByte(g) + _toHexByte(b) + _toHexByte(a))
+    return ("#" + _toHexByte(r) + _toHexByte(g) + _toHexByte(b))
 end function
 
 alpha_to_hex = function(a)
