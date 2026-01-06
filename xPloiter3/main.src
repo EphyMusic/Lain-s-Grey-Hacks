@@ -1,5 +1,4 @@
 #include "utils/stage.gs"
-#include "utils/display.gs"
 
 
 Display.logoStart()

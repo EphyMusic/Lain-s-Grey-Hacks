@@ -1,6 +1,6 @@
 //#include "debug.gs"
 #include "utils/tmPro.gs"
-#include "utils/debug.gs"
+#include "utils/display.gs"
 #include "utils/utils.gs"
 #include "utils/network.gs"
 #include "utils/meta.gs"
