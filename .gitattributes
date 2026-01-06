@@ -1,0 +1,7 @@
+# Override language detection for miniscript files
+*.gs linguist-language=MiniScript
+*.src linguist-language=MiniScript
+
+# Ensure these files are included in language statistics
+*.gs linguist-detectable=true
+*.src linguist-detectable=true
