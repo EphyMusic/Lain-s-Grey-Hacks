@@ -1,4 +1,3 @@
-#include "tmPro.gs"
 // /// Text
 
 // TextLog = {}
@@ -80,12 +79,13 @@ Menu.runMenu = function()
     while true
         print(self.header,1)
         self.display(self.currentLine)
+        wait(0.15)
         sel = user_input(self.msg,0,1)
         if sel == "" then return self.currentLine - 1
         if code(sel) == 66 then return "back"
         if code(sel) == 85 then self.changeLine(-1)
         if code(sel) == 68 then self.changeLine(1)
-        wait(0.1)
+
     end while
 end function
 
