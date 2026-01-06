@@ -1,5 +1,4 @@
 /// Ports
-#include "debug.gs"
 openPorts = function(ip)
     router = get_router(ip)
     ports = [0]
