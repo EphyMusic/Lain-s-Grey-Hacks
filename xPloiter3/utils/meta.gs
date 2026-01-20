@@ -89,38 +89,48 @@ _getUsers = function(obj)
     root = _toRoot(obj)
     users = []
     for folder in root.get_folders()
+        if folder.name() == "root" then
+            users.push(folder)
+        end if
+    end for
+    for folder in root.get_folders()
         if folder.name() == "home" then
             homeFolder = folder
             for user in homeFolder.get_folders
                 users.push(user)
             end for
             continue
-        else if folder.name() == "root" then
-            users.push(folder)
         end if
     end for
     return users
 end function
 
 checkOwner = function(obj)
-    own = ""
-    users = _getUsers(obj)
-    rootPerm = false
-    for user in users
-        write = user.has_permission("w")
-        execute = user.has_permission("x")
-        if user.name() == "root" and (write and execute) then
-            rootPerm = true
-        end if
-        if write and execute then
-            if user.name() != "guest" then own = user.name()
-        end if
+    for user in _getUsers(obj)
+        if user.name != "guest" and (user.has_permission("x") and user.has_permission("w")) then return user.name
     end for
-
-    if rootPerm then return "root"
-    if not own then return "guest"
-    return own
+    return "guest"
 end function
+
+// checkOwner = function(obj)
+//     own = ""
+//     users = _getUsers(obj)
+//     rootPerm = false
+//     for user in users
+//         write = user.has_permission("w")
+//         execute = user.has_permission("x")
+//         if user.name() == "root" and (write and execute) then
+//             rootPerm = true
+//         end if
+//         if write and execute then
+//             if user.name() != "guest" then own = user.name()
+//         end if
+//     end for
+
+//     if rootPerm then return "root"
+//     if not own then return "guest"
+//     return own
+// end function
 
 listMem = function(exploits)
     if not exploits isa list then return("Error: not a list. Fix in listMem.")
@@ -153,6 +163,16 @@ _getPasswd = function(obj)
     end for
 end function
 
+_getUser = function(stri)
+    user = stri.split(":")[0]
+    return user
+end function
+
+_getHash = function(stri)
+    passHash = stri.split(":")[1]
+    return passHash
+end function
+
 crackPasswd = function(obj)
     content = _getPasswd(obj)
     deciphered = ""
@@ -166,16 +186,6 @@ crackPasswd = function(obj)
         if __pass_idx != passList.len() -1 then deciphered += (char(10))
     end for
     return deciphered
-end function
-
-_getUser = function(stri)
-    user = stri.split(":")[0]
-    return user
-end function
-
-_getHash = function(stri)
-    passHash = stri.split(":")[1]
-    return passHash
 end function
 
 savePasswd = function(passwd,ip)
@@ -201,12 +211,27 @@ _checkReportFolder = function()
     return
 end function
 
-_find = function(folder,findfile)
-    folder = get_shell.host_computer.File(folder)
-    for file in folder.get_files()
-        if file.name() == findfile then
-            return file
-        end if
+find_file = function(filename,folder="/")
+    for file in folder.get_files
+        if file.name == filename then return file
     end for
-    return null
+    for sub_folder in folder.get_folders
+        if sub_folder.name == filename then return sub_folder
+        result = find_file(filename, sub_folder)
+        if result != null then return result
+    end for
+end function
+
+Vector = {"classID": "Vector"}
+
+Vector.terminal = function(obj)
+    adminMon = _find("AdminMonitor.exe","/usr/bin").path()
+    if adminMon then get_shell.launch(adminMon)
+    obj.start_terminal()
+end function
+
+Vector.passwd = function(obj, network)
+    content = crackPasswd(obj)
+    res = savePasswd(content, network.ip)
+    print("Passwords stolen! Find them in " + home_dir + "/Credentials" + "/" + network.ip + "_passwd.txt")
 end function

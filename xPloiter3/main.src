@@ -3,4 +3,4 @@
 
 Display.logoStart()
 
-Stage.Loop()
+Stage.loop()

@@ -399,7 +399,7 @@ string.rotate = function(degree)
         return eList.join(char(10))
     end if
 
-    return("<rotate=""" + degree + """>" + self + "</rotate>")
+    return("<rotate=" + degree + ">" + self + "</rotate>")
 end function
 
 /*
