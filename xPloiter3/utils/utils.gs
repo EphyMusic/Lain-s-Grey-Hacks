@@ -1,30 +1,4 @@
-// /// Text
-
-// TextLog = {}
-
-// TextLog.Log = []
-
-// TextLog.currentLimit = 10
-
-// TextLog.clearLog = function()
-//     self.Log = []
-// end function
-
-// TextLog.add = function(entry)
-//     self.Log.push(entry)
-//     if self.Log.len > self.currentLimit then self.Log.remove(0)
-// end function
-
-// TextLog.add = function(entry)
-//     if entry then self.add(entry)
-//     wait(0.05)
-//     print(self.Log.join(char(10)),1)
-// end function
-
-// TextLog.warnLog = function(warning)
-//     print(self.Log.join(char(10)) + char(10) + warning.color(255,50,50),1)
-// end function
-
+// Debug
 Debug = {"classID": "Debug Tool"}
 Debug.objType = function(obj)
     text = typeof(obj) + " """ + obj + """"

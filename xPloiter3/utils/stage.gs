@@ -207,3 +207,7 @@ Stage.loop = function()
         end if
     end while
 end function
+
+Stage.altLoop = function()
+    
+end function

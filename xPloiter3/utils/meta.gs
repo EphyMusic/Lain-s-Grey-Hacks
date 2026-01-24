@@ -106,31 +106,14 @@ _getUsers = function(obj)
 end function
 
 checkOwner = function(obj)
+    // for user in _getUsers(obj)
+    //     if user.name == "root" and (user.has_permission("x") and user.has_permission("w")) then return user.name
+    // end for
     for user in _getUsers(obj)
         if user.name != "guest" and (user.has_permission("x") and user.has_permission("w")) then return user.name
     end for
     return "guest"
 end function
-
-// checkOwner = function(obj)
-//     own = ""
-//     users = _getUsers(obj)
-//     rootPerm = false
-//     for user in users
-//         write = user.has_permission("w")
-//         execute = user.has_permission("x")
-//         if user.name() == "root" and (write and execute) then
-//             rootPerm = true
-//         end if
-//         if write and execute then
-//             if user.name() != "guest" then own = user.name()
-//         end if
-//     end for
-
-//     if rootPerm then return "root"
-//     if not own then return "guest"
-//     return own
-// end function
 
 listMem = function(exploits)
     if not exploits isa list then return("Error: not a list. Fix in listMem.")
@@ -234,4 +217,8 @@ Vector.passwd = function(obj, network)
     content = crackPasswd(obj)
     res = savePasswd(content, network.ip)
     print("Passwords stolen! Find them in " + home_dir + "/Credentials" + "/" + network.ip + "_passwd.txt")
+end function
+
+Vector.keepActiveUser = function(obj)
+    
 end function
