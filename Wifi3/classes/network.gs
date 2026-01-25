@@ -21,7 +21,7 @@ WifiNet.output = function()
     else
         pwr = (str(self.pwr) + "%").color(255,25,25)
     end if
-    return self.bssid.color(255,25,255) + "     " + self.bssid + "     " + pwr 
+    return self.essid.color(255,25,255) + "     " + self.bssid + "     " + pwr 
 end function
 
 WifiNet.cap = function()
