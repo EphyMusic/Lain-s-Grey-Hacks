@@ -1,0 +1,7 @@
+#include "classes/loop.gs"
+skip = null
+if params then
+    skip = params[0]
+end if
+
+run(skip)
