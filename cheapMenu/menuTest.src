@@ -1,0 +1,64 @@
+#include "menu.gs"
+
+tests = []
+choices = []
+for idx in range(10)
+    act = function()
+        print(__idx_idx + " <----> Success")
+        wait(2.5)
+    end function
+    x = Choice.make(__idx_idx + " < Print",@act)
+    choices.push(x)
+end for
+tests.push(Menu.make(choices,"test0"))
+
+choices = []
+
+for idx in range(3)
+    act = function()
+        print(__idx_idx + " <----> Success")
+        wait(2.5)
+    end function
+    x = Choice.make(__idx_idx + " < Print",@act)
+    choices.push(x)
+end for
+tests.push(Menu.make(choices,"test1"))
+
+choices = []
+
+for idx in range(7)
+    act = function()
+        print(__idx_idx + " <----> Success")
+        wait(2.5)
+    end function
+    x = Choice.make(__idx_idx + " < Print",@act)
+    choices.push(x)
+end for
+tests.push(Menu.make(choices,"test2"))
+
+choices = []
+
+for idx in range(22)
+    act = function()
+        print(__idx_idx + " <----> Success")
+        wait(2.5)
+    end function
+    x = Choice.make(__idx_idx + " < Print",@act)
+    choices.push(x)
+end for
+tests.push(Menu.make(choices,"test3"))
+
+choices = []
+
+for idx in range(0)
+    act = function()
+        exit("exit <----> Success")
+    end function
+    x = Choice.make(__idx_idx + " < Exit",@act)
+    choices.push(x)
+end for
+tests.push(Menu.make(choices,"test4"))
+
+for test in tests
+    action = test.run()
+end for
